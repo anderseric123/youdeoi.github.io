@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>原油供需全景跟踪</title>
+  <script src="./echarts.min.js"></script>
+  <script src="./crude-oil-supply-demand-data.js"></script>
+  <style>
+    :root {
+      --bg: #f3eee5;
+      --bg-deep: #e8ddcc;
+      --ink: #16130f;
+      --muted: #6f655a;
+      --line: rgba(73, 58, 41, 0.15);
+      --card: rgba(255, 252, 247, 0.88);
+      --card-strong: rgba(255, 249, 240, 0.98);
+      --navy: #1e2c3f;
+      --navy-soft: #314d73;
+      --amber: #c07b2b;
+      --amber-soft: #e5c083;
+      --rust: #b34d32;
+      --teal: #2f7c76;
+      --green: #2f7c52;
+      --shadow: 0 26px 56px rgba(34, 24, 14, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: 'Source Han Sans', 'Noto Sans CJK SC', sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(192, 123, 43, 0.18), transparent 30%),
+        radial-gradient(circle at 92% 8%, rgba(47, 124, 118, 0.14), transparent 26%),
+        linear-gradient(180deg, #faf6ee 0%, var(--bg) 42%, #ece2d3 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(51, 37, 22, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(51, 37, 22, 0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 88%);
+    }
+
+    .page {
+      width: min(1320px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 22px 0 48px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      padding: 38px 46px 34px;
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 14% 18%, rgba(229, 192, 131, 0.2), transparent 24%),
+        radial-gradient(circle at 88% 12%, rgba(47, 124, 118, 0.18), transparent 22%),
+        linear-gradient(135deg, rgba(16, 25, 38, 0.99), rgba(28, 46, 72, 0.98));
+      box-shadow: var(--shadow);
+      color: #f9f4ec;
+      animation: reveal-up 0.8s ease both;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -70px -82px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(192, 123, 43, 0.38), transparent 70%);
+      filter: blur(24px);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      width: min(860px, 100%);
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: rgba(245, 224, 190, 0.92);
+      letter-spacing: 0.18em;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245, 224, 190, 0.9), transparent);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 780px;
+      margin-inline: auto;
+      font-family: 'Source Han Sans', 'Noto Sans CJK SC', sans-serif;
+      font-size: clamp(44px, 5.4vw, 68px);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-subtitle {
+      max-width: 760px;
+      margin: 20px auto 24px;
+      color: rgba(252, 247, 239, 0.9);
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.72;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .hero-meta span {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 13px;
+      color: rgba(252, 247, 239, 0.92);
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .quick-card,
+    .panel {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .quick-card {
+      padding: 18px 18px 16px;
+      animation: reveal-up 0.8s ease both;
+    }
+
+    .quick-card:nth-child(2) { animation-delay: 0.06s; }
+    .quick-card:nth-child(3) { animation-delay: 0.12s; }
+    .quick-card:nth-child(4) { animation-delay: 0.18s; }
+
+    .quick-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+    }
+
+    .quick-value {
+      margin-top: 10px;
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .quick-unit {
+      margin-top: 8px;
+      color: #4e4338;
+      font-size: 14px;
+    }
+
+    .quick-delta {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .delta-up {
+      background: rgba(179, 77, 50, 0.1);
+      color: var(--rust);
+    }
+
+    .delta-down {
+      background: rgba(47, 124, 118, 0.1);
+      color: var(--teal);
+    }
+
+    .delta-flat {
+      background: rgba(30, 44, 63, 0.08);
+      color: var(--navy);
+    }
+
+    .headline-strip {
+      margin-top: 18px;
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(90deg, rgba(255, 248, 236, 0.96), rgba(248, 239, 226, 0.82)),
+        linear-gradient(120deg, rgba(192, 123, 43, 0.08), rgba(47, 124, 118, 0.08));
+      border: 1px solid rgba(192, 123, 43, 0.14);
+      box-shadow: var(--shadow);
+      animation: reveal-up 0.82s ease both;
+    }
+
+    .headline-strip strong {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      letter-spacing: 0.14em;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .headline-strip p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.7;
+      color: #2f251d;
+    }
+
+    .panel-stack {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.86fr);
+      gap: 18px;
+    }
+
+    .triple-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.86fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px 0;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 22px;
+      color: var(--navy);
+    }
+
+    .panel-desc {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .panel-tools {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tool-btn {
+      appearance: none;
+      border: 1px solid rgba(30, 44, 63, 0.12);
+      border-radius: 999px;
+      background: rgba(30, 44, 63, 0.04);
+      color: var(--navy);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tool-btn.active,
+    .tool-btn:hover {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+
+    .panel-body {
+      padding: 14px 20px 20px;
+    }
+
+    .chart {
+      width: 100%;
+      min-height: 360px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(252, 248, 241, 0.94));
+      border: 1px solid rgba(73, 58, 41, 0.08);
+    }
+
+    .chart-large {
+      min-height: 430px;
+    }
+
+    .chart-compact {
+      min-height: 260px;
+    }
+
+    .spotlight {
+      display: grid;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .spot-card {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(73, 58, 41, 0.1);
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(246, 239, 229, 0.96));
+    }
+
+    .spot-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+    }
+
+    .spot-main {
+      margin-top: 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--navy);
+    }
+
+    .spot-main strong {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .spot-main span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-banner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 250, 242, 0.96), rgba(243, 235, 223, 0.92));
+      border: 1px solid rgba(73, 58, 41, 0.08);
+    }
+
+    .metric-main {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--navy);
+    }
+
+    .metric-main strong {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .metric-main span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status-badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--navy);
+      white-space: nowrap;
+    }
+
+    .status-deep-backwardation,
+    .status-backwardation {
+      background: linear-gradient(135deg, #b34d32, #cb7f40);
+    }
+
+    .status-flat {
+      background: linear-gradient(135deg, #53616f, #7d8a96);
+    }
+
+    .status-contango,
+    .status-deep-contango {
+      background: linear-gradient(135deg, #2f7c76, #4b8f62);
+    }
+
+    .spot-meta {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .spot-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: #3d332a;
+    }
+
+    .spot-row strong {
+      color: var(--navy);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .spot-note {
+      margin-top: 12px;
+      color: #5a4e42;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .signal-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(73, 58, 41, 0.08);
+      background: rgba(255, 255, 255, 0.84);
+      color: var(--navy);
+    }
+
+    .signal-chip.positive {
+      color: var(--green);
+      background: rgba(47, 124, 82, 0.08);
+    }
+
+    .signal-chip.neutral {
+      color: var(--navy);
+      background: rgba(30, 44, 63, 0.08);
+    }
+
+    .signal-chip.warning {
+      color: var(--rust);
+      background: rgba(179, 77, 50, 0.08);
+    }
+
+    .signal-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(73, 58, 41, 0.08);
+    }
+
+    .signal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .signal-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .signal-text {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .signal-value {
+      font-size: 13px;
+      font-weight: 800;
+      color: #41362d;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .insight-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(73, 58, 41, 0.1);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(247, 239, 229, 0.94));
+    }
+
+    .insight-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .insight-card p {
+      margin: 0;
+      color: #372d25;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .source-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ai-card {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(73, 58, 41, 0.1);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(247, 239, 229, 0.92));
+    }
+
+    .ai-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .ai-card p {
+      margin: 0;
+      color: #3d3228;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .split-metric-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .mini-metric-card {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(73, 58, 41, 0.08);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(245, 237, 226, 0.94));
+    }
+
+    .mini-metric-card span,
+    .mini-metric-card small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .mini-metric-card span {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mini-metric-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 34px;
+      line-height: 1;
+      color: var(--navy);
+    }
+
+    .mini-metric-card small {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .table-card {
+      margin-top: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(73, 58, 41, 0.08);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .opec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .opec-table th,
+    .opec-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(73, 58, 41, 0.08);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .opec-table th:first-child,
+    .opec-table td:first-child {
+      text-align: left;
+    }
+
+    .opec-table th {
+      background: rgba(30, 44, 63, 0.06);
+      color: var(--navy);
+      font-weight: 800;
+    }
+
+    .source-item {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(73, 58, 41, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .source-item strong {
+      display: block;
+      font-size: 14px;
+      color: var(--navy);
+    }
+
+    .source-item span,
+    .source-item a {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .source-item a {
+      color: var(--amber);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @keyframes reveal-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .hero,
+      .panel-grid,
+      .triple-grid,
+      .insight-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100vw - 16px, 1320px);
+        padding-top: 12px;
+      }
+
+      .hero {
+        min-height: 260px;
+        padding: 26px 20px 24px;
+      }
+
+      .quick-grid,
+      .insight-grid,
+      .split-metric-row {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-head {
+        flex-direction: column;
+      }
+
+      .chart,
+      .chart-large {
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow">原油供需跟踪</p>
+        <h1 id="heroTitle">原油供需全景跟踪</h1>
+        <p class="hero-subtitle" id="heroHeadline"></p>
+        <div class="hero-meta">
+          <span id="heroTag1">全球浮仓</span>
+          <span id="heroTag2">EIA 全球平衡</span>
+          <span id="heroTag3">美国商业库存</span>
+          <span id="heroTag4">炼厂开工</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick-grid">
+      <article class="quick-card">
+        <div class="quick-label">全球浮仓</div>
+        <div class="quick-value" id="kpiFloatingValue">0</div>
+        <div class="quick-unit">万桶</div>
+        <div class="quick-delta" id="kpiFloatingDelta"></div>
+      </article>
+      <article class="quick-card">
+        <div class="quick-label">全球月度平衡</div>
+        <div class="quick-value" id="kpiBalanceValue">0</div>
+        <div class="quick-unit">万桶/日</div>
+        <div class="quick-delta" id="kpiBalanceDelta"></div>
+      </article>
+      <article class="quick-card">
+        <div class="quick-label">美国商业库存</div>
+        <div class="quick-value" id="kpiCommercialValue">0</div>
+        <div class="quick-unit">万桶</div>
+        <div class="quick-delta" id="kpiCommercialDelta"></div>
+      </article>
+      <article class="quick-card">
+        <div class="quick-label">炼厂开工率</div>
+        <div class="quick-value" id="kpiRefineryValue">0</div>
+        <div class="quick-unit">%</div>
+        <div class="quick-delta" id="kpiRefineryDelta"></div>
+      </article>
+    </section>
+
+    <section class="headline-strip">
+      <strong>市场解读</strong>
+      <p id="summaryHeadline"></p>
+    </section>
+
+    <div class="panel-stack">
+      <section class="panel-grid" id="floating">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">全球浮式原油库存</h2>
+            </div>
+            <div class="panel-tools" id="floatingTools">
+              <button class="tool-btn active" data-range="all">全部</button>
+              <button class="tool-btn" data-range="16">近16点</button>
+              <button class="tool-btn" data-range="10">近10点</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="floatingChart" class="chart chart-large"></div>
+          </div>
+        </article>
+        <aside class="spotlight">
+          <div class="spot-card">
+            <div class="spot-label">浮仓焦点</div>
+            <div class="spot-main">
+              <strong id="spotFloatingValue">0</strong>
+              <span>万桶</span>
+            </div>
+            <div class="spot-meta">
+              <div class="spot-row"><span>观察日期</span><strong id="spotFloatingDate">-</strong></div>
+              <div class="spot-row"><span>WTI 对照</span><strong id="spotFloatingWti">-</strong></div>
+              <div class="spot-row"><span>较上周</span><strong id="spotFloatingWow">-</strong></div>
+              <div class="spot-row"><span>与 8 周均值</span><strong id="spotFloatingVsAvg">-</strong></div>
+            </div>
+            <div class="spot-note" id="spotFloatingNote"></div>
+          </div>
+          <div class="spot-card">
+            <div class="spot-label">当前信号</div>
+            <div class="signal-list" id="signalList"></div>
+          </div>
+          <div class="ai-card">
+            <strong>AI解读</strong>
+            <p id="floatingAiText"></p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel-grid" id="spread">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">WTI近月-次月月差</h2>
+              <p class="panel-desc">月差比库存更快反映现货端的紧张度。近月升水扩大，通常意味着市场在抢现货；近月贴水扩大，则更像库存与供应压力抬头。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="metric-banner">
+              <div>
+                <div class="spot-label">最新可比收盘</div>
+                <div class="metric-main">
+                  <strong id="spreadCurrentValue">0.00</strong>
+                  <span>美元/桶</span>
+                </div>
+              </div>
+              <div class="status-badge" id="spreadStatusBadge">平坦</div>
+            </div>
+            <div id="spreadChart" class="chart"></div>
+          </div>
+        </article>
+        <aside class="spotlight">
+          <div class="spot-card">
+            <div class="spot-label">月差状态</div>
+            <div class="spot-main">
+              <strong id="spreadSpotStatus">-</strong>
+              <span id="spreadSpotDate">-</span>
+            </div>
+            <div class="spot-meta">
+              <div class="spot-row"><span>近月价格</span><strong id="spreadFrontValue">-</strong></div>
+              <div class="spot-row"><span>次月价格</span><strong id="spreadSecondValue">-</strong></div>
+              <div class="spot-row"><span>较前一日</span><strong id="spreadWowValue">-</strong></div>
+            </div>
+            <div class="spot-note" id="spreadNote"></div>
+          </div>
+          <div class="ai-card">
+            <strong>AI解读</strong>
+            <p id="spreadAiText"></p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">八条关键观察</h2>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="insight-grid" id="insightGrid"></div>
+        </div>
+      </section>
+
+      <section class="panel-grid" id="balance">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">全球原油平衡表</h2>
+              <p class="panel-desc">采用 EIA STEO 月度口径：柱体显示供需盈余/缺口，折线同步显示全球产量与消费量，并用虚线标识历史与预测分界。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="balanceChart" class="chart chart-large"></div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">供需侧写</h2>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="signal-list" id="balanceSignalList"></div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="balanceAiText"></p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="triple-grid" id="inventory">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">美国商业库存与库欣</h2>
+              <p class="panel-desc">商业库存决定全美缓冲，库欣库存则更接近近月交割约束。双轴同屏可以快速识别“全国宽松 / 库欣偏紧”或相反状态。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="inventoryChart" class="chart"></div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="inventoryAiText"></p>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">成品油联动</h2>
+              <p class="panel-desc">原油去库并不一定等于真强，只有汽油与馏分油库存同步改善，才更容易形成产业链验证。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="chip-row" id="productChipList"></div>
+            <div class="signal-list" id="productSignalList"></div>
+            <div id="cushingGauge" class="chart chart-compact"></div>
+            <div class="signal-list" id="cushingSignalList"></div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="productAiText"></p>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">炼厂开工与库存周变动</h2>
+              <p class="panel-desc">高开工通常意味着原油近端需求仍在，配合库存周变动条形可以更快判断“需求拉动”还是“供给回补”在主导周度节奏。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="refineryChart" class="chart"></div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="refineryAiText"></p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel-grid" id="cracks">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">汽油 / 柴油裂解价差</h2>
+              <p class="panel-desc">炼厂开工能否持续，关键不只在开工率本身，更在于炼油利润是否继续支持原油采购。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="split-metric-row">
+              <div class="mini-metric-card">
+                <span>汽油裂差</span>
+                <strong id="gasolineCrackValue">0.0</strong>
+                <small>美元/桶</small>
+              </div>
+              <div class="mini-metric-card">
+                <span>柴油裂差</span>
+                <strong id="dieselCrackValue">0.0</strong>
+                <small>美元/桶</small>
+              </div>
+            </div>
+            <div id="crackChart" class="chart"></div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="crackAiText"></p>
+            </div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">OPEC+实际产量 / 执行率</h2>
+              <p class="panel-desc">边际供给最关键的变量之一，不在总量叙事，而在于减产到底有没有执行、超产是否还在持续。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="opecChart" class="chart chart-compact"></div>
+            <div class="table-card">
+              <table class="opec-table">
+                <thead>
+                  <tr>
+                    <th>国家</th>
+                    <th>目标</th>
+                    <th>实际</th>
+                    <th>偏差</th>
+                  </tr>
+                </thead>
+                <tbody id="opecTableBody"></tbody>
+              </table>
+            </div>
+            <div class="ai-card">
+              <strong>AI解读</strong>
+              <p id="opecAiText"></p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const dashboard = window.CRUDE_OIL_SUPPLY_DASHBOARD;
+      if (!dashboard || !window.echarts) {
+        return;
+      }
+
+      const floatingData = dashboard.floatingStorage.series;
+      const globalBalanceData = dashboard.globalBalance.series.filter(item => item.date >= "2024-01");
+      const usData = dashboard.usSupplyDemand.series.filter(item => item.date >= "2024-01-05");
+      const spreadData = dashboard.wtiSpread.series;
+      const crackData = dashboard.crackSpreads.series;
+      const summary = dashboard.summary;
+
+      const charts = [];
+      let floatingChart;
+      let spreadChart;
+      let currentFloatingSubset = floatingData.slice();
+      let currentFloatingIndex = currentFloatingSubset.length - 1;
+
+      function formatMonthSpreadStatus(status) {
+        return status;
+      }
+
+      function statusClass(status) {
+        if (status === "深升水") return "status-deep-backwardation";
+        if (status === "弱升水") return "status-backwardation";
+        if (status === "平坦") return "status-flat";
+        if (status === "弱贴水") return "status-contango";
+        return "status-deep-contango";
+      }
+
+      function formatDate(date) {
+        if (!date) return "-";
+        if (date.length === 7) {
+          const [year, month] = date.split("-");
+          return `${year}年${Number(month)}月`;
+        }
+        const [year, month, day] = date.split("-");
+        return `${year}年${Number(month)}月${Number(day)}日`;
+      }
+
+      function formatSigned(value, digits = 1, suffix = "") {
+        const sign = value > 0 ? "+" : "";
+        return `${sign}${value.toFixed(digits)}${suffix}`;
+      }
+
+      function formatBig(value, digits = 1) {
+        return `${value.toFixed(digits)}`;
+      }
+
+      function buildDetailedMarketRead() {
+        const floating = dashboard.floatingStorage;
+        const balance = summary.latestBalance;
+        const us = dashboard.usSupplyDemand;
+        const products = dashboard.products;
+        const crack = dashboard.crackSpreads;
+        const spread = dashboard.wtiSpread;
+        const opec = dashboard.opecPlus;
+        const floatingDirection = floating.wowPct < 0 ? "明显回落" : "继续抬升";
+        const balancePhrase = balance.surplus > 0 ? "月度口径仍偏供给盈余" : "月度口径已转向供给缺口";
+        const inventoryPhrase = us.commercialVs52wAvg > 0 ? "高于" : "低于";
+        const cushingPhrase = us.cushingChange8w > 0 ? "回升" : "回落";
+        const productsPhrase = products.gasolineVs5y < 0 && products.distillateVs5y < 0 ? "成品油库存也在同步走强" : "成品油端尚未形成一致验证";
+
+        return `短线来看，全球浮式原油库存最新为 ${(floating.latest.value * 100).toFixed(0)} 万桶，较前一周${floatingDirection}，且较阶段高点已回落 ${Math.abs(floating.fromPeakPct).toFixed(1)}%，说明此前堆积在海上的缓冲正在被消化。` +
+          `${balance.date} 的全球原油平衡表则显示 ${balancePhrase}，对应 ${Math.abs(balance.surplus * 100).toFixed(0)} 万桶/日，因此总量上还不能简单理解成“全面短缺”。` +
+          `但交易层面，WTI 近月-次月月差最新处于“${spread.status}”区间，说明近端结构波动依然很大；美国商业库存目前 ${inventoryPhrase} 52 周均值 ${(Math.abs(us.commercialVs52wAvg) / 10).toFixed(0)} 万桶，库欣库存 8 周累计${cushingPhrase} ${(Math.abs(us.cushingChange8w) / 10).toFixed(0)} 万桶，说明交割缓冲并没有回到极端紧张状态。` +
+          `与此同时，${productsPhrase}，汽油/柴油裂解价差最新分别为 ${crack.latest.gasoline.toFixed(1)} 与 ${crack.latest.diesel.toFixed(1)} 美元/桶，炼厂利润虽仍不低但边际上在收缩；再结合 OPEC 月报口径下 ${opec.latestMonth} 的 OPEC+ 执行率约 ${opec.latest.execution.toFixed(1)}%，当前市场更像“宏观总量未极紧、但近端结构和地缘扰动仍足以抬高价格弹性”的阶段。`;
+      }
+
+      function buildAiTexts() {
+        const floating = dashboard.floatingStorage;
+        const balance = summary.latestBalance;
+        const us = dashboard.usSupplyDemand;
+        const products = dashboard.products;
+        const crack = dashboard.crackSpreads;
+        const spread = dashboard.wtiSpread;
+        const cushing = dashboard.cushingPercentile;
+        const opec = dashboard.opecPlus;
+
+        return {
+          floating: `最新浮仓为 ${(floating.latest.value * 100).toFixed(0)} 万桶，较前一周 ${floating.wowPct < 0 ? "下降" : "上升"} ${Math.abs(floating.wowPct).toFixed(2)}%，同时已低于 8 周均值 ${Math.abs((floating.latest.value - floating.eightWeekAverage) * 100).toFixed(0)} 万桶。趋势上看，海上缓冲正在从高位回吐，说明近端供应压力没有继续堆积，若价格仍强，往往意味着现货端的紧张度在抬升。`,
+          balance: `全球平衡表最新历史值显示当月 ${balance.surplus > 0 ? "盈余" : "缺口"} ${Math.abs(balance.surplus * 100).toFixed(0)} 万桶/日，且未来三个月均值约为 ${(summary.avgNextThreeMonthDraw * 100).toFixed(0)} 万桶/日。从趋势看，月度口径并未进入持续性极端紧平衡，更接近“总量不缺、节奏偏紧”的结构，因此价格驱动更容易来自节奏错配与地缘扰动。`,
+          inventory: `美国商业库存最新 ${(us.latestCommercial.value / 10).toFixed(0)} 万桶，仍较 52 周均值高出 ${Math.abs(us.commercialVs52wAvg / 10).toFixed(0)} 万桶；库欣库存最新 ${(us.latestCushing.value / 10).toFixed(0)} 万桶，过去 8 周累计增加 ${(us.cushingChange8w / 10).toFixed(0)} 万桶。整体看，陆上缓冲处于修复中，尤其库欣回升意味着近月交割约束有所缓和。`,
+          refinery: `炼厂开工率最新 ${us.latestRefineryUtil.value.toFixed(1)}%，仍处高位运行区间；与此同时，最近一周商业库存变动为 ${(us.commercialWow / 10).toFixed(0)} 万桶。趋势上看，加工端对原油的吸纳能力仍在，库存变化更多体现供给补库与运输节奏，而不是需求端明显转弱。`,
+          spread: `WTI 近月-次月月差最新可比收盘为 ${spread.latest.spread.toFixed(2)} 美元/桶，状态落在“${spread.status}”。如果月差继续向升水端扩大，通常意味着现货偏紧信号增强；反之若贴水扩大，则更接近库存和供应压力重新主导。`,
+          product: `美国汽油库存最新 ${(products.gasolineLatest.value / 10).toFixed(0)} 万桶，较 5 年同期 ${products.gasolineVs5y < 0 ? "低" : "高"} ${Math.abs(products.gasolineVs5y / 10).toFixed(0)} 万桶；馏分油库存最新 ${(products.distillateLatest.value / 10).toFixed(0)} 万桶，较 5 年同期 ${products.distillateVs5y < 0 ? "低" : "高"} ${Math.abs(products.distillateVs5y / 10).toFixed(0)} 万桶。库欣位于过去 5 年的 ${cushing.percentile5y.toFixed(1)}% 分位，说明交割缓冲更接近中性，而不是极端偏紧。`,
+          crack: `汽油裂解价差最新 ${crack.latest.gasoline.toFixed(2)} 美元/桶，柴油裂解价差 ${crack.latest.diesel.toFixed(2)} 美元/桶，30 日均值约 ${crack.avg30d.toFixed(2)} 美元/桶。当前利润水平仍能支撑炼厂采购原油，但边际方向已经转入“${crack.regime}”，意味着油价若想继续走强，需要看到终端需求或月差重新强化。`,
+          opec: `OPEC 月报口径下，OPEC+ 最新可比月份为 ${opec.latestMonth}，总执行率约 ${opec.latest.execution.toFixed(1)}%。从 2025 年四季度到 2026 年初，执行率整体稳定在 100% 附近并边际修复，意味着联盟层面的供给纪律没有明显松动；但俄罗斯、伊拉克和哈萨克斯坦仍然是交易层面最值得盯的边际变量。`
+        };
+      }
+
+      function setDeltaChip(element, value, template) {
+        element.textContent = template;
+        element.className = "quick-delta " + (value > 0 ? "delta-up" : value < 0 ? "delta-down" : "delta-flat");
+      }
+
+      function animateValue(element, target, digits, suffix) {
+        const duration = 900;
+        const start = performance.now();
+        const step = (now) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          element.textContent = `${(target * eased).toFixed(digits)}${suffix}`;
+          if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        window.setTimeout(() => {
+          element.textContent = `${target.toFixed(digits)}${suffix}`;
+        }, duration + 80);
+      }
+
+      function updateHero() {
+        document.getElementById("heroTitle").textContent = dashboard.meta.title;
+        document.getElementById("heroHeadline").textContent = summary.headline;
+        document.getElementById("summaryHeadline").textContent = buildDetailedMarketRead();
+        document.getElementById("heroTag1").textContent = "全球浮仓";
+        document.getElementById("heroTag2").textContent = "WTI月差";
+        document.getElementById("heroTag3").textContent = "裂解价差";
+        document.getElementById("heroTag4").textContent = "OPEC+执行";
+
+        animateValue(document.getElementById("kpiFloatingValue"), dashboard.floatingStorage.latest.value * 100, 0, "");
+        animateValue(document.getElementById("kpiBalanceValue"), Math.abs(summary.latestBalance.surplus) * 100, 0, "");
+        animateValue(document.getElementById("kpiCommercialValue"), dashboard.usSupplyDemand.latestCommercial.value / 10, 0, "");
+        animateValue(document.getElementById("kpiRefineryValue"), dashboard.usSupplyDemand.latestRefineryUtil.value, 1, "");
+
+        setDeltaChip(
+          document.getElementById("kpiFloatingDelta"),
+          dashboard.floatingStorage.wowPct,
+          `较上周 ${formatSigned(dashboard.floatingStorage.wowPct, 2, "%")}`
+        );
+        setDeltaChip(
+          document.getElementById("kpiBalanceDelta"),
+          summary.latestBalance.surplus,
+          `${summary.latestBalance.surplus > 0 ? "当月盈余" : "当月缺口"} ${formatBig(Math.abs(summary.latestBalance.surplus) * 100, 0)} 万桶/日`
+        );
+        setDeltaChip(
+          document.getElementById("kpiCommercialDelta"),
+          dashboard.usSupplyDemand.commercialWow,
+          `周变动 ${formatSigned(dashboard.usSupplyDemand.commercialWow / 10, 0, " 万桶")}`
+        );
+        setDeltaChip(
+          document.getElementById("kpiRefineryDelta"),
+          dashboard.usSupplyDemand.latestRefineryUtil.value - 90,
+          `高于 90% 线 ${formatSigned(dashboard.usSupplyDemand.latestRefineryUtil.value - 90, 1, "pct")}`
+        );
+      }
+
+      function signalRow(name, text, value, color) {
+        return `
+          <div class="signal-item">
+            <span class="signal-dot" style="background:${color}"></span>
+            <div>
+              <div class="signal-name">${name}</div>
+              <div class="signal-text">${text}</div>
+            </div>
+            <div class="signal-value">${value}</div>
+          </div>
+        `;
+      }
+
+      function updateSignals() {
+        const floating = dashboard.floatingStorage;
+        const balance = summary.latestBalance;
+        const us = dashboard.usSupplyDemand;
+        const signalHtml = [
+          signalRow(
+            "海上缓冲",
+            floating.latest.value > floating.eightWeekAverage ? "仍高于 8 周均值" : "已回到 8 周均值下方",
+            `${(floating.latest.value * 100).toFixed(0)}万桶`,
+            floating.latest.value > floating.eightWeekAverage ? "#b34d32" : "#2f7c76"
+          ),
+          signalRow(
+            "全球平衡",
+            balance.surplus > 0 ? "月度盈余，偏累库" : "月度缺口，偏去库",
+            `${balance.surplus > 0 ? "+" : "-"}${Math.abs(balance.surplus * 100).toFixed(0)}万桶/日`,
+            balance.surplus > 0 ? "#c07b2b" : "#2f7c52"
+          ),
+          signalRow(
+            "美国商业库存",
+            us.commercialVs52wAvg > 0 ? "高于过去52周均值" : "低于过去52周均值",
+            `${(us.latestCommercial.value / 10).toFixed(0)}万桶`,
+            us.commercialVs52wAvg > 0 ? "#c07b2b" : "#2f7c52"
+          ),
+          signalRow(
+            "炼厂开工",
+            us.latestRefineryUtil.value >= 90 ? "近端原油需求仍高" : "加工端拉动趋缓",
+            `${us.latestRefineryUtil.value.toFixed(1)}%`,
+            us.latestRefineryUtil.value >= 90 ? "#2f7c52" : "#c07b2b"
+          )
+        ].join("");
+
+        document.getElementById("signalList").innerHTML = signalHtml;
+
+        const balanceSignals = [
+          signalRow(
+            "未来 3 个月均值",
+            summary.avgNextThreeMonthDraw > 0 ? "隐含去库延续" : "隐含累库延续",
+            `${(summary.avgNextThreeMonthDraw * 100).toFixed(0)} 万桶/日`,
+            summary.avgNextThreeMonthDraw > 0 ? "#2f7c52" : "#c07b2b"
+          ),
+          signalRow(
+            "库欣 8 周变化",
+            dashboard.usSupplyDemand.cushingChange8w > 0 ? "交割缓冲回升" : "交割缓冲收缩",
+            `${(dashboard.usSupplyDemand.cushingChange8w / 10).toFixed(0)} 万桶`,
+            dashboard.usSupplyDemand.cushingChange8w > 0 ? "#c07b2b" : "#2f7c52"
+          ),
+          signalRow(
+            "商业库存周变化",
+            dashboard.usSupplyDemand.commercialWow > 0 ? "陆上库存回补" : "库存去化",
+            `${(dashboard.usSupplyDemand.commercialWow / 10).toFixed(0)} 万桶`,
+            dashboard.usSupplyDemand.commercialWow > 0 ? "#c07b2b" : "#2f7c52"
+          ),
+          signalRow(
+            "浮仓 vs 高点",
+            "衡量海上库存是否退潮",
+            `${dashboard.floatingStorage.fromPeakPct.toFixed(1)}%`,
+            "#2f7c76"
+          )
+        ].join("");
+
+        document.getElementById("balanceSignalList").innerHTML = balanceSignals;
+
+        const products = dashboard.products;
+        document.getElementById("productChipList").innerHTML = [
+          `<span class="signal-chip ${products.crudeBias === "原油偏紧" ? "positive" : "warning"}">${products.crudeBias}</span>`,
+          `<span class="signal-chip ${products.productBias === "成品油偏强" ? "positive" : "neutral"}">${products.productBias}</span>`,
+          `<span class="signal-chip ${dashboard.crackSpreads.regime === "炼厂利润扩张" ? "positive" : dashboard.crackSpreads.regime === "炼厂利润收缩" ? "warning" : "neutral"}">${dashboard.crackSpreads.regime}</span>`
+        ].join("");
+
+        document.getElementById("productSignalList").innerHTML = [
+          signalRow(
+            "汽油库存",
+            products.gasolineVs5y < 0 ? "低于5年同期，偏支持原油" : "高于5年同期，成品油验证一般",
+            `${(products.gasolineLatest.value / 10).toFixed(0)} 万桶`,
+            products.gasolineVs5y < 0 ? "#2f7c52" : "#c07b2b"
+          ),
+          signalRow(
+            "馏分油库存",
+            products.distillateVs5y < 0 ? "低于5年同期，柴油端偏强" : "高于5年同期，柴油端一般",
+            `${(products.distillateLatest.value / 10).toFixed(0)} 万桶`,
+            products.distillateVs5y < 0 ? "#2f7c52" : "#c07b2b"
+          ),
+          signalRow(
+            "裂解支撑",
+            dashboard.crackSpreads.regime,
+            `${dashboard.crackSpreads.avg30d.toFixed(1)} 美元/桶`,
+            dashboard.crackSpreads.regime === "炼厂利润收缩" ? "#c07b2b" : "#2f7c52"
+          )
+        ].join("");
+
+        const cushing = dashboard.cushingPercentile;
+        const streakText = cushing.streak.direction === "持平" ? "无连续趋势" : `${cushing.streak.direction}${cushing.streak.weeks}周`;
+        document.getElementById("cushingSignalList").innerHTML = [
+          signalRow("5年分位", cushing.bandLabel, `${cushing.percentile5y.toFixed(1)}%`, cushing.percentile5y <= 20 ? "#b34d32" : "#2f7c76"),
+          signalRow("连续周数", "观察库欣缓冲方向", streakText, cushing.streak.direction === "连降" ? "#b34d32" : "#2f7c76")
+        ].join("");
+      }
+
+      function renderInsights() {
+        const insightGrid = document.getElementById("insightGrid");
+        insightGrid.innerHTML = summary.insights
+          .map((item, index) => `
+            <article class="insight-card">
+              <strong>观察 ${index + 1}</strong>
+              <p>${item}</p>
+            </article>
+          `)
+          .join("");
+      }
+
+      function renderAiTexts() {
+        const aiTexts = buildAiTexts();
+        document.getElementById("floatingAiText").textContent = aiTexts.floating;
+        document.getElementById("spreadAiText").textContent = aiTexts.spread;
+        document.getElementById("balanceAiText").textContent = aiTexts.balance;
+        document.getElementById("inventoryAiText").textContent = aiTexts.inventory;
+        document.getElementById("productAiText").textContent = aiTexts.product;
+        document.getElementById("refineryAiText").textContent = aiTexts.refinery;
+        document.getElementById("crackAiText").textContent = aiTexts.crack;
+        document.getElementById("opecAiText").textContent = aiTexts.opec;
+      }
+
+      function floatingSubsetFromRange(rangeValue) {
+        if (rangeValue === "all") return floatingData.slice();
+        return floatingData.slice(-Number(rangeValue));
+      }
+
+      function floatingNote(point, previousPoint) {
+        if (!previousPoint) {
+          return "这是当前序列的起点，建议结合后续点位观察海上库存向价格传导的方向。";
+        }
+        const wow = ((point.value / previousPoint.value) - 1) * 100;
+        const distanceToAvg = point.value - dashboard.floatingStorage.eightWeekAverage;
+        if (wow < -10 && point.wti !== null && point.wti > 80) {
+          return "浮仓快速回落且油价同步上冲，通常意味着海上缓冲在被迅速消化，近端紧张度上升。";
+        }
+        if (distanceToAvg > 0 && wow > 0) {
+          return "当前浮仓高于 8 周均值且继续抬升，更接近供应缓冲扩张，而不是近端紧平衡。";
+        }
+        return "当前点位更像库存修复与价格扰动并行阶段，需要同时盯全球平衡表与美国库存确认方向。";
+      }
+
+      function updateFloatingSpotlight(index) {
+        const point = currentFloatingSubset[index];
+        if (!point) return;
+        const previousPoint = currentFloatingSubset[index - 1];
+        const wow = previousPoint ? ((point.value / previousPoint.value) - 1) * 100 : 0;
+        const avgDiff = point.value - dashboard.floatingStorage.eightWeekAverage;
+
+        document.getElementById("spotFloatingValue").textContent = (point.value * 100).toFixed(0);
+        document.getElementById("spotFloatingDate").textContent = formatDate(point.date);
+        document.getElementById("spotFloatingWti").textContent = point.wti == null ? "-" : `${point.wti.toFixed(2)} 美元/桶`;
+        document.getElementById("spotFloatingWow").textContent = previousPoint ? `${formatSigned(wow, 2, "%")}` : "-";
+        document.getElementById("spotFloatingVsAvg").textContent = `${formatSigned(avgDiff * 100, 0, " 万桶")}`;
+        document.getElementById("spotFloatingNote").textContent = floatingNote(point, previousPoint);
+      }
+
+      function focusFloatingPoint(index) {
+        if (!floatingChart || index == null || index < 0) return;
+        floatingChart.dispatchAction({ type: "hideTip" });
+        currentFloatingSubset.forEach((_, pointIndex) => {
+          floatingChart.dispatchAction({ type: "downplay", seriesIndex: 0, dataIndex: pointIndex });
+        });
+        floatingChart.dispatchAction({ type: "showTip", seriesIndex: 0, dataIndex: index });
+        floatingChart.dispatchAction({ type: "highlight", seriesIndex: 0, dataIndex: index });
+      }
+
+      function renderFloatingChart(rangeValue) {
+        currentFloatingSubset = floatingSubsetFromRange(rangeValue);
+        currentFloatingIndex = currentFloatingSubset.length - 1;
+
+        const dates = currentFloatingSubset.map(item => item.date);
+        const floatingValues = currentFloatingSubset.map(item => item.value * 100);
+        const wtiValues = currentFloatingSubset.map(item => item.wti);
+
+        if (!floatingChart) {
+          floatingChart = echarts.init(document.getElementById("floatingChart"));
+          charts.push(floatingChart);
+          floatingChart.on("mouseover", params => {
+            if (typeof params.dataIndex === "number") {
+              currentFloatingIndex = params.dataIndex;
+              updateFloatingSpotlight(currentFloatingIndex);
+              focusFloatingPoint(currentFloatingIndex);
+            }
+          });
+          floatingChart.on("globalout", () => {
+            currentFloatingIndex = currentFloatingSubset.length - 1;
+            updateFloatingSpotlight(currentFloatingIndex);
+            focusFloatingPoint(currentFloatingIndex);
+          });
+        }
+
+        floatingChart.setOption({
+          animationDuration: 900,
+          animationEasing: "cubicOut",
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" },
+            axisPointer: { type: "cross", label: { backgroundColor: "#314d73" } },
+            formatter(params) {
+              const [storage, wti] = params;
+              return [
+                `<div style="font-size:13px;margin-bottom:6px;">${formatDate(storage.axisValue)}</div>`,
+                `<div>浮仓: <strong>${storage.data.toFixed(0)}</strong> 万桶</div>`,
+                `<div>WTI: <strong>${wti.data == null ? "-" : wti.data.toFixed(2)}</strong> 美元/桶</div>`
+              ].join("");
+            }
+          },
+          grid: { left: 56, right: 58, top: 48, bottom: 48 },
+          legend: {
+            top: 10,
+            textStyle: { color: "#5f5347" },
+            itemWidth: 18,
+            itemHeight: 10
+          },
+          xAxis: {
+            type: "category",
+            data: dates,
+            boundaryGap: false,
+            axisLabel: {
+              color: "#7a6b5d",
+              formatter(value) {
+                return value.slice(5);
+              }
+            },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: [
+            {
+              type: "value",
+              name: "万桶",
+              nameTextStyle: { color: "#7a6b5d" },
+              axisLabel: { color: "#7a6b5d" },
+              splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+            },
+            {
+              type: "value",
+              name: "美元/桶",
+              nameTextStyle: { color: "#7a6b5d" },
+              axisLabel: { color: "#7a6b5d" },
+              splitLine: { show: false }
+            }
+          ],
+          dataZoom: [
+            { type: "inside", start: 0, end: 100 },
+            { type: "slider", height: 18, bottom: 8, borderColor: "rgba(73,58,41,0.08)", fillerColor: "rgba(48,77,115,0.12)" }
+          ],
+          series: [
+            {
+              name: "全球浮仓",
+              type: "line",
+              smooth: 0.22,
+              symbol: "circle",
+              symbolSize: 8,
+                data: floatingValues,
+              lineStyle: { width: 3, color: "#c07b2b" },
+              itemStyle: { color: "#c07b2b", borderColor: "#fff8ef", borderWidth: 2 },
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: "rgba(192,123,43,0.32)" },
+                  { offset: 1, color: "rgba(192,123,43,0.03)" }
+                ])
+              },
+              markLine: {
+                symbol: "none",
+                lineStyle: { color: "rgba(192,123,43,0.55)", type: "dashed" },
+                label: { color: "#7a6b5d", formatter: `8周均值 ${(dashboard.floatingStorage.eightWeekAverage * 100).toFixed(0)}万桶` },
+                data: [{ yAxis: dashboard.floatingStorage.eightWeekAverage * 100 }]
+              }
+            },
+            {
+              name: "WTI",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.16,
+              symbol: "none",
+              data: wtiValues,
+              lineStyle: { width: 2, color: "#2f7c76" },
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: "rgba(47,124,118,0.16)" },
+                  { offset: 1, color: "rgba(47,124,118,0.01)" }
+                ])
+              }
+            }
+          ]
+        });
+
+        updateFloatingSpotlight(currentFloatingIndex);
+        focusFloatingPoint(currentFloatingIndex);
+      }
+
+      function renderSpreadChart() {
+        const latest = dashboard.wtiSpread.latest;
+        const previous = dashboard.wtiSpread.series[dashboard.wtiSpread.series.length - 2];
+        document.getElementById("spreadCurrentValue").textContent = latest.spread.toFixed(2);
+        document.getElementById("spreadSpotStatus").textContent = formatMonthSpreadStatus(dashboard.wtiSpread.status);
+        document.getElementById("spreadSpotDate").textContent = formatDate(latest.date);
+        document.getElementById("spreadFrontValue").textContent = `${latest.front.toFixed(2)} 美元/桶`;
+        document.getElementById("spreadSecondValue").textContent = `${latest.second.toFixed(2)} 美元/桶`;
+        document.getElementById("spreadWowValue").textContent = `${formatSigned(dashboard.wtiSpread.wow, 2, " 美元/桶")}`;
+        document.getElementById("spreadNote").textContent =
+          latest.spread > 0
+            ? "近月升水扩大时，通常意味着现货偏紧信号增强，价格对供应扰动会更敏感。"
+            : "近月贴水扩大时，更接近库存与供应压力回到盘面主导，现货端并未形成抢货。";
+
+        const badge = document.getElementById("spreadStatusBadge");
+        badge.textContent = dashboard.wtiSpread.status;
+        badge.className = `status-badge ${statusClass(dashboard.wtiSpread.status)}`;
+
+        spreadChart = echarts.init(document.getElementById("spreadChart"));
+        charts.push(spreadChart);
+        spreadChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" },
+            formatter(params) {
+              const item = params[0];
+              return [
+                `<div style="font-size:13px;margin-bottom:6px;">${formatDate(item.axisValue)}</div>`,
+                `<div>近月-次月: <strong>${item.data.toFixed(2)}</strong> 美元/桶</div>`
+              ].join("");
+            }
+          },
+          grid: { left: 54, right: 34, top: 28, bottom: 38 },
+          xAxis: {
+            type: "category",
+            data: spreadData.map(item => item.date),
+            boundaryGap: false,
+            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: {
+            type: "value",
+            name: "美元/桶",
+            nameTextStyle: { color: "#7a6b5d" },
+            axisLabel: { color: "#7a6b5d" },
+            splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+          },
+          series: [
+            {
+              name: "WTI月差",
+              type: "line",
+              smooth: 0.18,
+              symbol: "circle",
+              symbolSize: 7,
+              data: spreadData.map(item => item.spread),
+              lineStyle: { width: 3, color: "#b34d32" },
+              itemStyle: { color: "#b34d32", borderColor: "#fff8ef", borderWidth: 2 },
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: "rgba(179,77,50,0.28)" },
+                  { offset: 1, color: "rgba(179,77,50,0.02)" }
+                ])
+              },
+              markLine: {
+                symbol: "none",
+                lineStyle: { color: "rgba(49,77,115,0.35)", type: "dashed" },
+                data: [{ yAxis: 0 }]
+              }
+            }
+          ]
+        });
+      }
+
+      function renderCushingGauge() {
+        const gauge = echarts.init(document.getElementById("cushingGauge"));
+        charts.push(gauge);
+        gauge.setOption({
+          animationDuration: 900,
+          series: [
+            {
+              type: "gauge",
+              startAngle: 210,
+              endAngle: -30,
+              min: 0,
+              max: 100,
+              radius: "88%",
+              progress: {
+                show: true,
+                width: 14,
+                itemStyle: {
+                  color: dashboard.cushingPercentile.percentile5y <= 20 ? "#b34d32" : "#2f7c76"
+                }
+              },
+              pointer: { show: false },
+              axisLine: { lineStyle: { width: 14, color: [[1, "rgba(30,44,63,0.12)"]] } },
+              axisTick: { show: false },
+              splitLine: { show: false },
+              axisLabel: { color: "#7a6b5d", distance: 18, fontSize: 11 },
+              title: { offsetCenter: [0, "34%"], color: "#6f655a", fontSize: 12 },
+              detail: {
+                valueAnimation: true,
+                offsetCenter: [0, "-2%"],
+                formatter: value => `${value.toFixed(1)}%`,
+                color: "#1e2c3f",
+                fontSize: 28,
+                fontWeight: 800
+              },
+              data: [{ value: dashboard.cushingPercentile.percentile5y, name: "库欣5年分位" }]
+            }
+          ]
+        });
+      }
+
+      function renderCrackChart() {
+        document.getElementById("gasolineCrackValue").textContent = dashboard.crackSpreads.latest.gasoline.toFixed(1);
+        document.getElementById("dieselCrackValue").textContent = dashboard.crackSpreads.latest.diesel.toFixed(1);
+
+        const crackChart = echarts.init(document.getElementById("crackChart"));
+        charts.push(crackChart);
+        crackChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" }
+          },
+          legend: { top: 10, textStyle: { color: "#5f5347" } },
+          grid: { left: 54, right: 34, top: 46, bottom: 40 },
+          xAxis: {
+            type: "category",
+            data: crackData.map(item => item.date),
+            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: {
+            type: "value",
+            name: "美元/桶",
+            nameTextStyle: { color: "#7a6b5d" },
+            axisLabel: { color: "#7a6b5d" },
+            splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+          },
+          series: [
+            {
+              name: "汽油裂差",
+              type: "line",
+              smooth: 0.16,
+              symbol: "none",
+              lineStyle: { width: 2.8, color: "#c07b2b" },
+              data: crackData.map(item => item.gasoline)
+            },
+            {
+              name: "柴油裂差",
+              type: "line",
+              smooth: 0.16,
+              symbol: "none",
+              lineStyle: { width: 2.8, color: "#314d73" },
+              data: crackData.map(item => item.diesel)
+            }
+          ]
+        });
+      }
+
+      function renderOpecBlock() {
+        const opecChart = echarts.init(document.getElementById("opecChart"));
+        charts.push(opecChart);
+        const trend = dashboard.opecPlus.trend;
+        opecChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" }
+          },
+          legend: { top: 10, textStyle: { color: "#5f5347" } },
+          grid: { left: 54, right: 46, top: 44, bottom: 40 },
+          xAxis: {
+            type: "category",
+            data: trend.map(item => item.date),
+            axisLabel: { color: "#7a6b5d" },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: [
+            {
+              type: "value",
+              name: "百万桶/日",
+              axisLabel: { color: "#7a6b5d" },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+            },
+            {
+              type: "value",
+              name: "执行率",
+              min: 96,
+              max: 102,
+              axisLabel: { color: "#7a6b5d", formatter: value => `${value}%` },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { show: false }
+            }
+          ],
+          series: [
+            {
+              name: "实际产量",
+              type: "bar",
+              barMaxWidth: 18,
+              itemStyle: { color: "rgba(192,123,43,0.82)" },
+              data: trend.map(item => item.actual)
+            },
+            {
+              name: "目标产量",
+              type: "line",
+              smooth: 0.12,
+              symbol: "circle",
+              symbolSize: 7,
+              lineStyle: { width: 2.4, color: "#2f7c76" },
+              itemStyle: { color: "#2f7c76" },
+              data: trend.map(item => item.target)
+            },
+            {
+              name: "执行率",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.16,
+              symbol: "none",
+              lineStyle: { width: 2.2, color: "#b34d32" },
+              data: trend.map(item => item.execution)
+            }
+          ]
+        });
+
+        document.getElementById("opecTableBody").innerHTML = dashboard.opecPlus.countries
+          .map(item => `
+            <tr>
+              <td>${item.country}</td>
+              <td>${item.target.toFixed(2)}</td>
+              <td>${item.actual.toFixed(2)}</td>
+              <td style="color:${item.deviation > 0 ? "#b34d32" : "#2f7c76"}">${formatSigned(item.deviation, 2, "")}</td>
+            </tr>
+          `)
+          .join("");
+      }
+
+      function renderBalanceChart() {
+        const balanceChart = echarts.init(document.getElementById("balanceChart"));
+        charts.push(balanceChart);
+
+        const dates = globalBalanceData.map(item => item.date);
+        const surplus = globalBalanceData.map(item => item.surplus * 100);
+        const production = globalBalanceData.map(item => item.production * 100);
+        const consumption = globalBalanceData.map(item => item.consumption * 100);
+        const surplusBars = surplus.map(value => value > 0 ? value : null);
+        const deficitBars = surplus.map(value => value < 0 ? value : null);
+        const forecastDate = globalBalanceData.find(item => !item.isHistorical)?.date;
+
+        balanceChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" },
+            formatter(params) {
+              const bar = params.find(item => item.seriesName === "盈余") || params.find(item => item.seriesName === "缺口");
+              const prod = params.find(item => item.seriesName === "产量");
+              const cons = params.find(item => item.seriesName === "消费量");
+              return [
+                `<div style="font-size:13px;margin-bottom:6px;">${formatDate(bar.axisValue)}</div>`,
+                `<div>供需平衡差: <strong>${bar.data.toFixed(0)}</strong> 万桶/日</div>`,
+                `<div>产量: <strong>${prod.data.toFixed(0)}</strong> 万桶/日</div>`,
+                `<div>消费量: <strong>${cons.data.toFixed(0)}</strong> 万桶/日</div>`
+              ].join("");
+            }
+          },
+          legend: {
+            top: 10,
+            textStyle: { color: "#5f5347" }
+          },
+          grid: { left: 58, right: 70, top: 48, bottom: 48 },
+          xAxis: {
+            type: "category",
+            data: dates,
+            axisLabel: {
+              color: "#7a6b5d",
+              formatter(value) {
+                return value.slice(2);
+              }
+            },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: [
+            {
+              type: "value",
+              name: "盈余 / 缺口",
+              nameTextStyle: { color: "#7a6b5d" },
+              axisLabel: { color: "#7a6b5d" },
+              splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+            },
+            {
+              type: "value",
+              name: "万桶/日",
+              nameTextStyle: { color: "#7a6b5d" },
+              axisLabel: {
+                color: "#7a6b5d",
+                margin: 14
+              },
+              splitLine: { show: false }
+            }
+          ],
+          series: [
+            {
+              name: "盈余",
+              type: "bar",
+              barMaxWidth: 18,
+              itemStyle: { color: "rgba(192,123,43,0.88)" },
+              data: surplusBars,
+              emphasis: { focus: "series" },
+              stack: "balance",
+              markLine: forecastDate ? {
+                symbol: "none",
+                lineStyle: { type: "dashed", color: "rgba(30,44,63,0.42)" },
+                label: { formatter: "预测起点", color: "#5f5347" },
+                data: [{ xAxis: forecastDate }]
+              } : undefined
+            },
+            {
+              name: "缺口",
+              type: "bar",
+              barMaxWidth: 18,
+              itemStyle: { color: "rgba(47,124,82,0.84)" },
+              data: deficitBars,
+              emphasis: { focus: "series" },
+              stack: "balance",
+              markLine: forecastDate ? {
+                symbol: "none",
+                lineStyle: { type: "dashed", color: "rgba(30,44,63,0.42)" },
+                label: { formatter: "预测起点", color: "#5f5347" },
+                data: [{ xAxis: forecastDate }]
+              } : undefined
+            },
+            {
+              name: "产量",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.18,
+              symbol: "none",
+              lineStyle: { width: 2.5, color: "#314d73" },
+              data: production
+            },
+            {
+              name: "消费量",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.18,
+              symbol: "none",
+              lineStyle: { width: 2.5, color: "#b34d32" },
+              data: consumption
+            }
+          ]
+        });
+      }
+
+      function renderInventoryChart() {
+        const inventoryChart = echarts.init(document.getElementById("inventoryChart"));
+        charts.push(inventoryChart);
+
+        const dates = usData.map(item => item.date);
+        const commercial = usData.map(item => item.commercial == null ? null : item.commercial / 10);
+        const cushing = usData.map(item => item.cushing == null ? null : item.cushing / 10);
+
+        inventoryChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" }
+          },
+          legend: {
+            top: 10,
+            textStyle: { color: "#5f5347" }
+          },
+          grid: { left: 54, right: 54, top: 48, bottom: 42 },
+          xAxis: {
+            type: "category",
+            data: dates,
+            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: [
+            {
+              type: "value",
+              name: "商业库存",
+              axisLabel: { color: "#7a6b5d" },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+            },
+            {
+              type: "value",
+              name: "库欣",
+              axisLabel: { color: "#7a6b5d" },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { show: false }
+            }
+          ],
+          dataZoom: [{ type: "inside" }],
+          series: [
+            {
+              name: "美国商业库存",
+              type: "line",
+              smooth: 0.16,
+              symbol: "none",
+              lineStyle: { width: 3, color: "#314d73" },
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: "rgba(49,77,115,0.22)" },
+                  { offset: 1, color: "rgba(49,77,115,0.02)" }
+                ])
+              },
+              data: commercial
+            },
+            {
+              name: "库欣库存",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.16,
+              symbol: "none",
+              lineStyle: { width: 2.5, color: "#c07b2b" },
+              data: cushing
+            }
+          ]
+        });
+      }
+
+      function renderRefineryChart() {
+        const refineryChart = echarts.init(document.getElementById("refineryChart"));
+        charts.push(refineryChart);
+
+        const dates = usData.map(item => item.date);
+        const refinery = usData.map(item => item.refineryUtil);
+        const stockChange = usData.map((item, index) => {
+          if (index === 0 || item.commercial == null || usData[index - 1].commercial == null) return 0;
+          return (item.commercial - usData[index - 1].commercial) / 10;
+        });
+
+        refineryChart.setOption({
+          animationDuration: 900,
+          tooltip: {
+            trigger: "axis",
+            backgroundColor: "rgba(20,18,15,0.92)",
+            borderWidth: 0,
+            textStyle: { color: "#f7f0e4" }
+          },
+          legend: {
+            top: 10,
+            textStyle: { color: "#5f5347" }
+          },
+          grid: { left: 54, right: 54, top: 48, bottom: 42 },
+          xAxis: {
+            type: "category",
+            data: dates,
+            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
+            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
+          },
+          yAxis: [
+            {
+              type: "value",
+              name: "库存周变动",
+              axisLabel: { color: "#7a6b5d" },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
+            },
+            {
+              type: "value",
+              name: "开工率",
+              min: 82,
+              max: 98,
+              axisLabel: { color: "#7a6b5d", formatter: value => `${value}%` },
+              nameTextStyle: { color: "#7a6b5d" },
+              splitLine: { show: false }
+            }
+          ],
+          dataZoom: [{ type: "inside" }],
+          series: [
+            {
+              name: "商业库存周变动",
+              type: "bar",
+              barMaxWidth: 16,
+              data: stockChange.map(value => ({
+                value,
+                itemStyle: {
+                  color: value >= 0 ? "rgba(192,123,43,0.88)" : "rgba(47,124,82,0.88)"
+                }
+              }))
+            },
+            {
+              name: "炼厂开工率",
+              type: "line",
+              yAxisIndex: 1,
+              smooth: 0.18,
+              symbol: "none",
+              lineStyle: { width: 2.6, color: "#b34d32" },
+              data: refinery
+            }
+          ]
+        });
+      }
+
+      function bindFloatingTools() {
+        document.getElementById("floatingTools").addEventListener("click", event => {
+          const button = event.target.closest(".tool-btn");
+          if (!button) return;
+          document.querySelectorAll("#floatingTools .tool-btn").forEach(item => item.classList.remove("active"));
+          button.classList.add("active");
+          renderFloatingChart(button.dataset.range);
+        });
+      }
+
+      function resizeAll() {
+        charts.forEach(chart => chart.resize());
+      }
+
+      updateHero();
+      updateSignals();
+      renderInsights();
+      renderAiTexts();
+      renderFloatingChart("all");
+      renderSpreadChart();
+      renderBalanceChart();
+      renderInventoryChart();
+      renderCushingGauge();
+      renderRefineryChart();
+      renderCrackChart();
+      renderOpecBlock();
+      bindFloatingTools();
+
+      window.addEventListener("resize", resizeAll);
+    })();
+  </script>
+</body>
+</html>
