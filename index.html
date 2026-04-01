@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -61,122 +62,124 @@
     }
 
     .page {
-      width: min(1320px, calc(100vw - 28px));
+      width: min(430px, calc(100vw - 20px));
       margin: 0 auto;
-      padding: 22px 0 48px;
+      padding: 10px 0 calc(88px + env(safe-area-inset-bottom, 0px));
     }
 
     .hero {
       position: relative;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 320px;
-      padding: 38px 46px 34px;
-      border-radius: var(--radius-xl);
+      display: block;
+      min-height: auto;
+      padding: 18px 18px 16px;
+      border-radius: 24px;
       background:
-        radial-gradient(circle at 14% 18%, rgba(229, 192, 131, 0.2), transparent 24%),
-        radial-gradient(circle at 88% 12%, rgba(47, 124, 118, 0.18), transparent 22%),
-        linear-gradient(135deg, rgba(16, 25, 38, 0.99), rgba(28, 46, 72, 0.98));
-      box-shadow: var(--shadow);
-      color: #f9f4ec;
-      animation: reveal-up 0.8s ease both;
+        radial-gradient(circle at 0% 0%, rgba(192, 123, 43, 0.16), transparent 34%),
+        radial-gradient(circle at 100% 0%, rgba(47, 124, 118, 0.14), transparent 30%),
+        linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(249, 242, 232, 0.96));
+      box-shadow: 0 14px 28px rgba(34, 24, 14, 0.08);
+      border: 1px solid rgba(73, 58, 41, 0.08);
+      color: var(--navy);
+      animation: reveal-up 0.6s ease both;
     }
 
     .hero::after {
       content: "";
       position: absolute;
-      inset: auto -70px -82px auto;
-      width: 280px;
-      height: 280px;
+      inset: auto -48px -72px auto;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(192, 123, 43, 0.38), transparent 70%);
-      filter: blur(24px);
+      background: radial-gradient(circle, rgba(192, 123, 43, 0.18), transparent 72%);
+      filter: blur(18px);
     }
 
     .hero-copy {
       position: relative;
       z-index: 1;
-      width: min(860px, 100%);
-      margin: 0 auto;
-      text-align: center;
+      width: 100%;
+      margin: 0;
+      text-align: left;
     }
 
     .eyebrow {
-      margin: 0 0 12px;
+      margin: 0 0 8px;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      color: rgba(245, 224, 190, 0.92);
-      letter-spacing: 0.18em;
-      font-size: 12px;
+      justify-content: flex-start;
+      gap: 8px;
+      color: var(--amber);
+      letter-spacing: 0.12em;
+      font-size: 11px;
       font-weight: 700;
     }
 
     .eyebrow::before,
     .eyebrow::after {
       content: "";
-      width: 34px;
+      width: 16px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(245, 224, 190, 0.9), transparent);
+      background: linear-gradient(90deg, transparent, rgba(192, 123, 43, 0.9), transparent);
     }
 
     .hero h1 {
       margin: 0;
-      max-width: 780px;
-      margin-inline: auto;
+      max-width: 280px;
       font-family: 'Source Han Sans', 'Noto Sans CJK SC', sans-serif;
-      font-size: clamp(44px, 5.4vw, 68px);
-      font-weight: 900;
+      font-size: 34px;
+      font-weight: 800;
       line-height: 1.06;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.04em;
     }
 
     .hero-subtitle {
-      max-width: 760px;
-      margin: 20px auto 24px;
-      color: rgba(252, 247, 239, 0.9);
-      font-size: clamp(18px, 2vw, 22px);
-      line-height: 1.72;
+      max-width: none;
+      margin: 12px 0 14px;
+      color: #3f342b;
+      font-size: 15px;
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .hero-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
+      gap: 8px;
+      justify-content: flex-start;
     }
 
     .hero-meta span {
-      padding: 10px 14px;
+      padding: 7px 10px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      font-size: 13px;
-      color: rgba(252, 247, 239, 0.92);
+      background: rgba(30, 44, 63, 0.05);
+      border: 1px solid rgba(30, 44, 63, 0.08);
+      font-size: 11px;
+      color: #445263;
     }
 
     .quick-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
     }
 
     .quick-card,
     .panel {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--line);
-      background: var(--card);
-      backdrop-filter: blur(14px);
-      box-shadow: var(--shadow);
+      border-radius: 20px;
+      border: 1px solid rgba(73, 58, 41, 0.08);
+      background: rgba(255, 252, 247, 0.9);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 26px rgba(34, 24, 14, 0.06);
     }
 
     .quick-card {
-      padding: 18px 18px 16px;
-      animation: reveal-up 0.8s ease both;
+      padding: 14px 14px 12px;
+      animation: reveal-up 0.6s ease both;
     }
 
     .quick-card:nth-child(2) { animation-delay: 0.06s; }
@@ -185,15 +188,14 @@
 
     .quick-label {
       color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+      font-size: 11px;
+      letter-spacing: 0.08em;
       font-weight: 700;
     }
 
     .quick-value {
-      margin-top: 10px;
-      font-size: clamp(28px, 4vw, 40px);
+      margin-top: 8px;
+      font-size: 30px;
       font-weight: 800;
       line-height: 1;
       color: var(--navy);
@@ -201,19 +203,19 @@
     }
 
     .quick-unit {
-      margin-top: 8px;
+      margin-top: 6px;
       color: #4e4338;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     .quick-delta {
-      margin-top: 12px;
+      margin-top: 10px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 6px 9px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
     }
 
@@ -233,15 +235,15 @@
     }
 
     .headline-strip {
-      margin-top: 18px;
-      padding: 18px 22px;
-      border-radius: var(--radius-lg);
+      margin-top: 10px;
+      padding: 14px 14px 12px;
+      border-radius: 18px;
       background:
-        linear-gradient(90deg, rgba(255, 248, 236, 0.96), rgba(248, 239, 226, 0.82)),
+        linear-gradient(90deg, rgba(255, 248, 236, 0.92), rgba(248, 239, 226, 0.78)),
         linear-gradient(120deg, rgba(192, 123, 43, 0.08), rgba(47, 124, 118, 0.08));
       border: 1px solid rgba(192, 123, 43, 0.14);
-      box-shadow: var(--shadow);
-      animation: reveal-up 0.82s ease both;
+      box-shadow: 0 10px 20px rgba(34, 24, 14, 0.05);
+      animation: reveal-up 0.62s ease both;
     }
 
     .headline-strip strong {
@@ -255,27 +257,90 @@
 
     .headline-strip p {
       margin: 0;
-      font-size: 18px;
-      line-height: 1.7;
+      font-size: 14px;
+      line-height: 1.55;
       color: #2f251d;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .section-nav {
+      position: sticky;
+      top: 8px;
+      z-index: 24;
+      display: block;
+      margin-top: 10px;
+      padding: 0;
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    .section-nav-label {
+      display: none;
+    }
+
+    .section-nav-list {
+      display: flex;
+      flex: 1;
+      flex-wrap: nowrap;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 2px 4px;
+      scrollbar-width: none;
+    }
+
+    .section-nav-link {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(30, 44, 63, 0.08);
+      background: rgba(255, 251, 246, 0.88);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+      box-shadow: 0 6px 12px rgba(34, 24, 14, 0.04);
+    }
+
+    .content-section.is-hidden {
+      display: none;
+    }
+
+    .section-nav-link:hover,
+    .section-nav-link.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+      transform: translateY(-1px);
     }
 
     .panel-stack {
       display: grid;
-      gap: 18px;
-      margin-top: 18px;
+      gap: 12px;
+      margin-top: 10px;
     }
 
     .panel-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.86fr);
-      gap: 18px;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     .triple-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.86fr) minmax(0, 1fr);
-      gap: 18px;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     .panel {
@@ -286,21 +351,25 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 14px;
-      padding: 18px 20px 0;
+      gap: 10px;
+      padding: 14px 14px 0;
     }
 
     .panel-title {
       margin: 0;
-      font-size: 22px;
+      font-size: 18px;
       color: var(--navy);
     }
 
     .panel-desc {
-      margin: 8px 0 0;
+      margin: 6px 0 0;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
+      font-size: 12px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .panel-tools {
@@ -315,8 +384,8 @@
       border-radius: 999px;
       background: rgba(30, 44, 63, 0.04);
       color: var(--navy);
-      padding: 8px 12px;
-      font-size: 12px;
+      padding: 7px 10px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -330,33 +399,33 @@
     }
 
     .panel-body {
-      padding: 14px 20px 20px;
+      padding: 12px 14px 14px;
     }
 
     .chart {
       width: 100%;
-      min-height: 360px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(252, 248, 241, 0.94));
+      min-height: 280px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(252, 248, 241, 0.94));
       border: 1px solid rgba(73, 58, 41, 0.08);
     }
 
     .chart-large {
-      min-height: 430px;
+      min-height: 320px;
     }
 
     .chart-compact {
-      min-height: 260px;
+      min-height: 220px;
     }
 
     .spotlight {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       height: 100%;
     }
 
     .spot-card {
-      padding: 16px;
+      padding: 14px;
       border-radius: 16px;
       border: 1px solid rgba(73, 58, 41, 0.1);
       background: linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(246, 239, 229, 0.96));
@@ -371,7 +440,7 @@
     }
 
     .spot-main {
-      margin-top: 10px;
+      margin-top: 8px;
       display: flex;
       align-items: baseline;
       gap: 8px;
@@ -379,7 +448,7 @@
     }
 
     .spot-main strong {
-      font-size: 38px;
+      font-size: 30px;
       line-height: 1;
       font-weight: 800;
     }
@@ -391,12 +460,12 @@
 
     .metric-banner {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 16px;
-      padding: 16px 18px;
-      border-radius: 18px;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 14px;
+      border-radius: 16px;
       background: linear-gradient(135deg, rgba(255, 250, 242, 0.96), rgba(243, 235, 223, 0.92));
       border: 1px solid rgba(73, 58, 41, 0.08);
     }
@@ -410,7 +479,7 @@
     }
 
     .metric-main strong {
-      font-size: 42px;
+      font-size: 34px;
       line-height: 1;
       font-weight: 800;
     }
@@ -421,9 +490,9 @@
     }
 
     .status-badge {
-      padding: 10px 14px;
+      padding: 8px 12px;
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       color: #fff;
       background: var(--navy);
@@ -445,9 +514,9 @@
     }
 
     .spot-meta {
-      margin-top: 10px;
+      margin-top: 8px;
       display: grid;
-      gap: 8px;
+      gap: 7px;
     }
 
     .spot-row {
@@ -465,16 +534,20 @@
     }
 
     .spot-note {
-      margin-top: 12px;
+      margin-top: 10px;
       color: #5a4e42;
-      font-size: 13px;
-      line-height: 1.7;
+      font-size: 12px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .signal-list {
       display: grid;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .chip-row {
@@ -511,9 +584,9 @@
     .signal-item {
       display: grid;
       grid-template-columns: auto 1fr auto;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
-      padding: 12px 14px;
+      padding: 10px 12px;
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.72);
       border: 1px solid rgba(73, 58, 41, 0.08);
@@ -578,8 +651,8 @@
     }
 
     .ai-card {
-      margin-top: 14px;
-      padding: 16px;
+      margin-top: 10px;
+      padding: 14px;
       border-radius: 16px;
       border: 1px solid rgba(73, 58, 41, 0.1);
       background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(247, 239, 229, 0.92));
@@ -597,19 +670,23 @@
     .ai-card p {
       margin: 0;
       color: #3d3228;
-      font-size: 13px;
-      line-height: 1.8;
+      font-size: 12px;
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .split-metric-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .mini-metric-card {
-      padding: 14px 16px;
+      padding: 12px 13px;
       border-radius: 16px;
       border: 1px solid rgba(73, 58, 41, 0.08);
       background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(245, 237, 226, 0.94));
@@ -631,7 +708,7 @@
     .mini-metric-card strong {
       display: block;
       margin-top: 8px;
-      font-size: 34px;
+      font-size: 28px;
       line-height: 1;
       color: var(--navy);
     }
@@ -642,7 +719,7 @@
     }
 
     .table-card {
-      margin-top: 16px;
+      margin-top: 12px;
       border-radius: 16px;
       border: 1px solid rgba(73, 58, 41, 0.08);
       overflow: hidden;
@@ -652,12 +729,12 @@
     .opec-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .opec-table th,
     .opec-table td {
-      padding: 10px 12px;
+      padding: 9px 10px;
       border-bottom: 1px solid rgba(73, 58, 41, 0.08);
       text-align: right;
       font-variant-numeric: tabular-nums;
@@ -709,6 +786,14 @@
       line-height: 1.7;
     }
 
+    #top,
+    #floating,
+    #balance,
+    #inventory,
+    #cracks {
+      scroll-margin-top: 92px;
+    }
+
     @keyframes reveal-up {
       from {
         opacity: 0;
@@ -720,43 +805,109 @@
       }
     }
 
-    @media (max-width: 1120px) {
-      .hero,
-      .panel-grid,
-      .triple-grid,
-      .insight-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 720px) {
+    @media (min-width: 720px) {
       .page {
-        width: min(100vw - 16px, 1320px);
-        padding-top: 12px;
+        width: min(1320px, calc(100vw - 28px));
+        padding: 22px 0 48px;
       }
 
       .hero {
-        min-height: 260px;
-        padding: 26px 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 320px;
+        padding: 38px 46px 34px;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow);
+        text-align: center;
       }
 
-      .quick-grid,
-      .insight-grid,
-      .split-metric-row {
-        grid-template-columns: 1fr;
+      .hero-copy {
+        width: min(860px, 100%);
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .hero h1 {
+        max-width: 780px;
+        margin-inline: auto;
+        font-size: clamp(44px, 5.4vw, 68px);
+      }
+
+      .hero-subtitle {
+        max-width: 760px;
+        margin: 20px auto 24px;
+        font-size: clamp(18px, 2vw, 22px);
+        line-height: 1.72;
+        -webkit-line-clamp: unset;
+        overflow: visible;
+        display: block;
+      }
+
+      .hero-meta {
+        justify-content: center;
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .headline-strip {
+        margin-top: 18px;
+        padding: 18px 22px;
+      }
+
+      .headline-strip p,
+      .panel-desc,
+      .spot-note,
+      .ai-card p {
+        display: block;
+        overflow: visible;
+      }
+
+      .section-nav {
+        top: 12px;
+      }
+
+      .section-nav-list {
+        justify-content: flex-start;
+      }
+
+      .panel-stack {
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .panel-grid {
+        grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.86fr);
+        gap: 18px;
+      }
+
+      .triple-grid {
+        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.86fr) minmax(0, 1fr);
+        gap: 18px;
       }
 
       .panel-head {
-        flex-direction: column;
+        padding: 18px 20px 0;
       }
 
-      .chart,
+      .panel-body {
+        padding: 14px 20px 20px;
+      }
+
+      .chart {
+        min-height: 360px;
+      }
+
       .chart-large {
-        min-height: 320px;
+        min-height: 430px;
+      }
+
+      .chart-compact {
+        min-height: 260px;
       }
     }
   </style>
@@ -809,8 +960,18 @@
       <p id="summaryHeadline"></p>
     </section>
 
+    <nav class="section-nav" aria-label="页面导航">
+      <span class="section-nav-label">快速导航</span>
+      <div class="section-nav-list">
+        <button class="section-nav-link active" type="button" data-nav-view="floating">浮仓</button>
+        <button class="section-nav-link" type="button" data-nav-view="balance">平衡表</button>
+        <button class="section-nav-link" type="button" data-nav-view="inventory">库存</button>
+        <button class="section-nav-link" type="button" data-nav-view="cracks">OPEC</button>
+      </div>
+    </nav>
+
     <div class="panel-stack">
-      <section class="panel-grid" id="floating">
+      <section class="panel-grid content-section" id="floating" data-section="floating">
         <article class="panel">
           <div class="panel-head">
             <div>
@@ -852,61 +1013,7 @@
         </aside>
       </section>
 
-      <section class="panel-grid" id="spread">
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">WTI近月-次月月差</h2>
-              <p class="panel-desc">月差比库存更快反映现货端的紧张度。近月升水扩大，通常意味着市场在抢现货；近月贴水扩大，则更像库存与供应压力抬头。</p>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="metric-banner">
-              <div>
-                <div class="spot-label">最新可比收盘</div>
-                <div class="metric-main">
-                  <strong id="spreadCurrentValue">0.00</strong>
-                  <span>美元/桶</span>
-                </div>
-              </div>
-              <div class="status-badge" id="spreadStatusBadge">平坦</div>
-            </div>
-            <div id="spreadChart" class="chart"></div>
-          </div>
-        </article>
-        <aside class="spotlight">
-          <div class="spot-card">
-            <div class="spot-label">月差状态</div>
-            <div class="spot-main">
-              <strong id="spreadSpotStatus">-</strong>
-              <span id="spreadSpotDate">-</span>
-            </div>
-            <div class="spot-meta">
-              <div class="spot-row"><span>近月价格</span><strong id="spreadFrontValue">-</strong></div>
-              <div class="spot-row"><span>次月价格</span><strong id="spreadSecondValue">-</strong></div>
-              <div class="spot-row"><span>较前一日</span><strong id="spreadWowValue">-</strong></div>
-            </div>
-            <div class="spot-note" id="spreadNote"></div>
-          </div>
-          <div class="ai-card">
-            <strong>AI解读</strong>
-            <p id="spreadAiText"></p>
-          </div>
-        </aside>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">八条关键观察</h2>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="insight-grid" id="insightGrid"></div>
-        </div>
-      </section>
-
-      <section class="panel-grid" id="balance">
+      <section class="panel-grid content-section" id="balance" data-section="balance">
         <article class="panel">
           <div class="panel-head">
             <div>
@@ -934,7 +1041,7 @@
         </article>
       </section>
 
-      <section class="triple-grid" id="inventory">
+      <section class="triple-grid content-section" id="inventory" data-section="inventory">
         <article class="panel">
           <div class="panel-head">
             <div>
@@ -985,34 +1092,7 @@
         </article>
       </section>
 
-      <section class="panel-grid" id="cracks">
-        <article class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">汽油 / 柴油裂解价差</h2>
-              <p class="panel-desc">炼厂开工能否持续，关键不只在开工率本身，更在于炼油利润是否继续支持原油采购。</p>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="split-metric-row">
-              <div class="mini-metric-card">
-                <span>汽油裂差</span>
-                <strong id="gasolineCrackValue">0.0</strong>
-                <small>美元/桶</small>
-              </div>
-              <div class="mini-metric-card">
-                <span>柴油裂差</span>
-                <strong id="dieselCrackValue">0.0</strong>
-                <small>美元/桶</small>
-              </div>
-            </div>
-            <div id="crackChart" class="chart"></div>
-            <div class="ai-card">
-              <strong>AI解读</strong>
-              <p id="crackAiText"></p>
-            </div>
-          </div>
-        </article>
+      <section class="panel-grid content-section" id="cracks" data-section="cracks">
         <article class="panel">
           <div class="panel-head">
             <div>
@@ -1056,27 +1136,12 @@
       const floatingData = dashboard.floatingStorage.series;
       const globalBalanceData = dashboard.globalBalance.series.filter(item => item.date >= "2024-01");
       const usData = dashboard.usSupplyDemand.series.filter(item => item.date >= "2024-01-05");
-      const spreadData = dashboard.wtiSpread.series;
-      const crackData = dashboard.crackSpreads.series;
       const summary = dashboard.summary;
 
       const charts = [];
       let floatingChart;
-      let spreadChart;
       let currentFloatingSubset = floatingData.slice();
       let currentFloatingIndex = currentFloatingSubset.length - 1;
-
-      function formatMonthSpreadStatus(status) {
-        return status;
-      }
-
-      function statusClass(status) {
-        if (status === "深升水") return "status-deep-backwardation";
-        if (status === "弱升水") return "status-backwardation";
-        if (status === "平坦") return "status-flat";
-        if (status === "弱贴水") return "status-contango";
-        return "status-deep-contango";
-      }
 
       function formatDate(date) {
         if (!date) return "-";
@@ -1102,8 +1167,6 @@
         const balance = summary.latestBalance;
         const us = dashboard.usSupplyDemand;
         const products = dashboard.products;
-        const crack = dashboard.crackSpreads;
-        const spread = dashboard.wtiSpread;
         const opec = dashboard.opecPlus;
         const floatingDirection = floating.wowPct < 0 ? "明显回落" : "继续抬升";
         const balancePhrase = balance.surplus > 0 ? "月度口径仍偏供给盈余" : "月度口径已转向供给缺口";
@@ -1113,8 +1176,8 @@
 
         return `短线来看，全球浮式原油库存最新为 ${(floating.latest.value * 100).toFixed(0)} 万桶，较前一周${floatingDirection}，且较阶段高点已回落 ${Math.abs(floating.fromPeakPct).toFixed(1)}%，说明此前堆积在海上的缓冲正在被消化。` +
           `${balance.date} 的全球原油平衡表则显示 ${balancePhrase}，对应 ${Math.abs(balance.surplus * 100).toFixed(0)} 万桶/日，因此总量上还不能简单理解成“全面短缺”。` +
-          `但交易层面，WTI 近月-次月月差最新处于“${spread.status}”区间，说明近端结构波动依然很大；美国商业库存目前 ${inventoryPhrase} 52 周均值 ${(Math.abs(us.commercialVs52wAvg) / 10).toFixed(0)} 万桶，库欣库存 8 周累计${cushingPhrase} ${(Math.abs(us.cushingChange8w) / 10).toFixed(0)} 万桶，说明交割缓冲并没有回到极端紧张状态。` +
-          `与此同时，${productsPhrase}，汽油/柴油裂解价差最新分别为 ${crack.latest.gasoline.toFixed(1)} 与 ${crack.latest.diesel.toFixed(1)} 美元/桶，炼厂利润虽仍不低但边际上在收缩；再结合 OPEC 月报口径下 ${opec.latestMonth} 的 OPEC+ 执行率约 ${opec.latest.execution.toFixed(1)}%，当前市场更像“宏观总量未极紧、但近端结构和地缘扰动仍足以抬高价格弹性”的阶段。`;
+          `美国商业库存目前 ${inventoryPhrase} 52 周均值 ${(Math.abs(us.commercialVs52wAvg) / 10).toFixed(0)} 万桶，库欣库存 8 周累计${cushingPhrase} ${(Math.abs(us.cushingChange8w) / 10).toFixed(0)} 万桶，说明交割缓冲并没有回到极端紧张状态。` +
+          `与此同时，${productsPhrase}；再结合 OPEC 月报口径下 ${opec.latestMonth} 的 OPEC+ 执行率约 ${opec.latest.execution.toFixed(1)}%，当前市场更像“总量未极紧、但结构与供给纪律仍值得跟踪”的阶段。`;
       }
 
       function buildAiTexts() {
@@ -1122,8 +1185,6 @@
         const balance = summary.latestBalance;
         const us = dashboard.usSupplyDemand;
         const products = dashboard.products;
-        const crack = dashboard.crackSpreads;
-        const spread = dashboard.wtiSpread;
         const cushing = dashboard.cushingPercentile;
         const opec = dashboard.opecPlus;
 
@@ -1132,9 +1193,7 @@
           balance: `全球平衡表最新历史值显示当月 ${balance.surplus > 0 ? "盈余" : "缺口"} ${Math.abs(balance.surplus * 100).toFixed(0)} 万桶/日，且未来三个月均值约为 ${(summary.avgNextThreeMonthDraw * 100).toFixed(0)} 万桶/日。从趋势看，月度口径并未进入持续性极端紧平衡，更接近“总量不缺、节奏偏紧”的结构，因此价格驱动更容易来自节奏错配与地缘扰动。`,
           inventory: `美国商业库存最新 ${(us.latestCommercial.value / 10).toFixed(0)} 万桶，仍较 52 周均值高出 ${Math.abs(us.commercialVs52wAvg / 10).toFixed(0)} 万桶；库欣库存最新 ${(us.latestCushing.value / 10).toFixed(0)} 万桶，过去 8 周累计增加 ${(us.cushingChange8w / 10).toFixed(0)} 万桶。整体看，陆上缓冲处于修复中，尤其库欣回升意味着近月交割约束有所缓和。`,
           refinery: `炼厂开工率最新 ${us.latestRefineryUtil.value.toFixed(1)}%，仍处高位运行区间；与此同时，最近一周商业库存变动为 ${(us.commercialWow / 10).toFixed(0)} 万桶。趋势上看，加工端对原油的吸纳能力仍在，库存变化更多体现供给补库与运输节奏，而不是需求端明显转弱。`,
-          spread: `WTI 近月-次月月差最新可比收盘为 ${spread.latest.spread.toFixed(2)} 美元/桶，状态落在“${spread.status}”。如果月差继续向升水端扩大，通常意味着现货偏紧信号增强；反之若贴水扩大，则更接近库存和供应压力重新主导。`,
           product: `美国汽油库存最新 ${(products.gasolineLatest.value / 10).toFixed(0)} 万桶，较 5 年同期 ${products.gasolineVs5y < 0 ? "低" : "高"} ${Math.abs(products.gasolineVs5y / 10).toFixed(0)} 万桶；馏分油库存最新 ${(products.distillateLatest.value / 10).toFixed(0)} 万桶，较 5 年同期 ${products.distillateVs5y < 0 ? "低" : "高"} ${Math.abs(products.distillateVs5y / 10).toFixed(0)} 万桶。库欣位于过去 5 年的 ${cushing.percentile5y.toFixed(1)}% 分位，说明交割缓冲更接近中性，而不是极端偏紧。`,
-          crack: `汽油裂解价差最新 ${crack.latest.gasoline.toFixed(2)} 美元/桶，柴油裂解价差 ${crack.latest.diesel.toFixed(2)} 美元/桶，30 日均值约 ${crack.avg30d.toFixed(2)} 美元/桶。当前利润水平仍能支撑炼厂采购原油，但边际方向已经转入“${crack.regime}”，意味着油价若想继续走强，需要看到终端需求或月差重新强化。`,
           opec: `OPEC 月报口径下，OPEC+ 最新可比月份为 ${opec.latestMonth}，总执行率约 ${opec.latest.execution.toFixed(1)}%。从 2025 年四季度到 2026 年初，执行率整体稳定在 100% 附近并边际修复，意味着联盟层面的供给纪律没有明显松动；但俄罗斯、伊拉克和哈萨克斯坦仍然是交易层面最值得盯的边际变量。`
         };
       }
@@ -1164,8 +1223,8 @@
         document.getElementById("heroHeadline").textContent = summary.headline;
         document.getElementById("summaryHeadline").textContent = buildDetailedMarketRead();
         document.getElementById("heroTag1").textContent = "全球浮仓";
-        document.getElementById("heroTag2").textContent = "WTI月差";
-        document.getElementById("heroTag3").textContent = "裂解价差";
+        document.getElementById("heroTag2").textContent = "全球平衡";
+        document.getElementById("heroTag3").textContent = "美国库存";
         document.getElementById("heroTag4").textContent = "OPEC+执行";
 
         animateValue(document.getElementById("kpiFloatingValue"), dashboard.floatingStorage.latest.value * 100, 0, "");
@@ -1273,8 +1332,7 @@
         const products = dashboard.products;
         document.getElementById("productChipList").innerHTML = [
           `<span class="signal-chip ${products.crudeBias === "原油偏紧" ? "positive" : "warning"}">${products.crudeBias}</span>`,
-          `<span class="signal-chip ${products.productBias === "成品油偏强" ? "positive" : "neutral"}">${products.productBias}</span>`,
-          `<span class="signal-chip ${dashboard.crackSpreads.regime === "炼厂利润扩张" ? "positive" : dashboard.crackSpreads.regime === "炼厂利润收缩" ? "warning" : "neutral"}">${dashboard.crackSpreads.regime}</span>`
+          `<span class="signal-chip ${products.productBias === "成品油偏强" ? "positive" : "neutral"}">${products.productBias}</span>`
         ].join("");
 
         document.getElementById("productSignalList").innerHTML = [
@@ -1289,12 +1347,6 @@
             products.distillateVs5y < 0 ? "低于5年同期，柴油端偏强" : "高于5年同期，柴油端一般",
             `${(products.distillateLatest.value / 10).toFixed(0)} 万桶`,
             products.distillateVs5y < 0 ? "#2f7c52" : "#c07b2b"
-          ),
-          signalRow(
-            "裂解支撑",
-            dashboard.crackSpreads.regime,
-            `${dashboard.crackSpreads.avg30d.toFixed(1)} 美元/桶`,
-            dashboard.crackSpreads.regime === "炼厂利润收缩" ? "#c07b2b" : "#2f7c52"
           )
         ].join("");
 
@@ -1306,27 +1358,13 @@
         ].join("");
       }
 
-      function renderInsights() {
-        const insightGrid = document.getElementById("insightGrid");
-        insightGrid.innerHTML = summary.insights
-          .map((item, index) => `
-            <article class="insight-card">
-              <strong>观察 ${index + 1}</strong>
-              <p>${item}</p>
-            </article>
-          `)
-          .join("");
-      }
-
       function renderAiTexts() {
         const aiTexts = buildAiTexts();
         document.getElementById("floatingAiText").textContent = aiTexts.floating;
-        document.getElementById("spreadAiText").textContent = aiTexts.spread;
         document.getElementById("balanceAiText").textContent = aiTexts.balance;
         document.getElementById("inventoryAiText").textContent = aiTexts.inventory;
         document.getElementById("productAiText").textContent = aiTexts.product;
         document.getElementById("refineryAiText").textContent = aiTexts.refinery;
-        document.getElementById("crackAiText").textContent = aiTexts.crack;
         document.getElementById("opecAiText").textContent = aiTexts.opec;
       }
 
@@ -1502,82 +1540,6 @@
         focusFloatingPoint(currentFloatingIndex);
       }
 
-      function renderSpreadChart() {
-        const latest = dashboard.wtiSpread.latest;
-        const previous = dashboard.wtiSpread.series[dashboard.wtiSpread.series.length - 2];
-        document.getElementById("spreadCurrentValue").textContent = latest.spread.toFixed(2);
-        document.getElementById("spreadSpotStatus").textContent = formatMonthSpreadStatus(dashboard.wtiSpread.status);
-        document.getElementById("spreadSpotDate").textContent = formatDate(latest.date);
-        document.getElementById("spreadFrontValue").textContent = `${latest.front.toFixed(2)} 美元/桶`;
-        document.getElementById("spreadSecondValue").textContent = `${latest.second.toFixed(2)} 美元/桶`;
-        document.getElementById("spreadWowValue").textContent = `${formatSigned(dashboard.wtiSpread.wow, 2, " 美元/桶")}`;
-        document.getElementById("spreadNote").textContent =
-          latest.spread > 0
-            ? "近月升水扩大时，通常意味着现货偏紧信号增强，价格对供应扰动会更敏感。"
-            : "近月贴水扩大时，更接近库存与供应压力回到盘面主导，现货端并未形成抢货。";
-
-        const badge = document.getElementById("spreadStatusBadge");
-        badge.textContent = dashboard.wtiSpread.status;
-        badge.className = `status-badge ${statusClass(dashboard.wtiSpread.status)}`;
-
-        spreadChart = echarts.init(document.getElementById("spreadChart"));
-        charts.push(spreadChart);
-        spreadChart.setOption({
-          animationDuration: 900,
-          tooltip: {
-            trigger: "axis",
-            backgroundColor: "rgba(20,18,15,0.92)",
-            borderWidth: 0,
-            textStyle: { color: "#f7f0e4" },
-            formatter(params) {
-              const item = params[0];
-              return [
-                `<div style="font-size:13px;margin-bottom:6px;">${formatDate(item.axisValue)}</div>`,
-                `<div>近月-次月: <strong>${item.data.toFixed(2)}</strong> 美元/桶</div>`
-              ].join("");
-            }
-          },
-          grid: { left: 54, right: 34, top: 28, bottom: 38 },
-          xAxis: {
-            type: "category",
-            data: spreadData.map(item => item.date),
-            boundaryGap: false,
-            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
-            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
-          },
-          yAxis: {
-            type: "value",
-            name: "美元/桶",
-            nameTextStyle: { color: "#7a6b5d" },
-            axisLabel: { color: "#7a6b5d" },
-            splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
-          },
-          series: [
-            {
-              name: "WTI月差",
-              type: "line",
-              smooth: 0.18,
-              symbol: "circle",
-              symbolSize: 7,
-              data: spreadData.map(item => item.spread),
-              lineStyle: { width: 3, color: "#b34d32" },
-              itemStyle: { color: "#b34d32", borderColor: "#fff8ef", borderWidth: 2 },
-              areaStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  { offset: 0, color: "rgba(179,77,50,0.28)" },
-                  { offset: 1, color: "rgba(179,77,50,0.02)" }
-                ])
-              },
-              markLine: {
-                symbol: "none",
-                lineStyle: { color: "rgba(49,77,115,0.35)", type: "dashed" },
-                data: [{ yAxis: 0 }]
-              }
-            }
-          ]
-        });
-      }
-
       function renderCushingGauge() {
         const gauge = echarts.init(document.getElementById("cushingGauge"));
         charts.push(gauge);
@@ -1613,56 +1575,6 @@
                 fontWeight: 800
               },
               data: [{ value: dashboard.cushingPercentile.percentile5y, name: "库欣5年分位" }]
-            }
-          ]
-        });
-      }
-
-      function renderCrackChart() {
-        document.getElementById("gasolineCrackValue").textContent = dashboard.crackSpreads.latest.gasoline.toFixed(1);
-        document.getElementById("dieselCrackValue").textContent = dashboard.crackSpreads.latest.diesel.toFixed(1);
-
-        const crackChart = echarts.init(document.getElementById("crackChart"));
-        charts.push(crackChart);
-        crackChart.setOption({
-          animationDuration: 900,
-          tooltip: {
-            trigger: "axis",
-            backgroundColor: "rgba(20,18,15,0.92)",
-            borderWidth: 0,
-            textStyle: { color: "#f7f0e4" }
-          },
-          legend: { top: 10, textStyle: { color: "#5f5347" } },
-          grid: { left: 54, right: 34, top: 46, bottom: 40 },
-          xAxis: {
-            type: "category",
-            data: crackData.map(item => item.date),
-            axisLabel: { color: "#7a6b5d", formatter: value => value.slice(5) },
-            axisLine: { lineStyle: { color: "rgba(73,58,41,0.14)" } }
-          },
-          yAxis: {
-            type: "value",
-            name: "美元/桶",
-            nameTextStyle: { color: "#7a6b5d" },
-            axisLabel: { color: "#7a6b5d" },
-            splitLine: { lineStyle: { color: "rgba(73,58,41,0.08)" } }
-          },
-          series: [
-            {
-              name: "汽油裂差",
-              type: "line",
-              smooth: 0.16,
-              symbol: "none",
-              lineStyle: { width: 2.8, color: "#c07b2b" },
-              data: crackData.map(item => item.gasoline)
-            },
-            {
-              name: "柴油裂差",
-              type: "line",
-              smooth: 0.16,
-              symbol: "none",
-              lineStyle: { width: 2.8, color: "#314d73" },
-              data: crackData.map(item => item.diesel)
             }
           ]
         });
@@ -2023,23 +1935,45 @@
         });
       }
 
+      function bindSectionNav() {
+        const links = Array.from(document.querySelectorAll("[data-nav-view]"));
+        const sections = Array.from(document.querySelectorAll("[data-section]"));
+
+        const setActive = (view) => {
+          links.forEach(link => {
+            const isActive = link.dataset.navView === view;
+            link.classList.toggle("active", isActive);
+            link.setAttribute("aria-pressed", isActive ? "true" : "false");
+          });
+          sections.forEach(section => {
+            const shouldShow = section.dataset.section === view;
+            section.classList.toggle("is-hidden", !shouldShow);
+          });
+          resizeAll();
+        };
+
+        links.forEach(link => {
+          link.addEventListener("click", () => setActive(link.dataset.navView));
+        });
+
+        setActive("floating");
+      }
+
       function resizeAll() {
         charts.forEach(chart => chart.resize());
       }
 
       updateHero();
       updateSignals();
-      renderInsights();
       renderAiTexts();
       renderFloatingChart("all");
-      renderSpreadChart();
       renderBalanceChart();
       renderInventoryChart();
       renderCushingGauge();
       renderRefineryChart();
-      renderCrackChart();
       renderOpecBlock();
       bindFloatingTools();
+      bindSectionNav();
 
       window.addEventListener("resize", resizeAll);
     })();
